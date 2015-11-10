@@ -1,0 +1,26 @@
+development:
+  adapter: sqlite3
+  host: localhost
+  database: db/development.sqlite3
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  pool: 5
+  timeout: 30000
+
+test:
+  adapter: sqlite3
+  host: localhost
+  database: db/test.sqlite3
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  host: localhost
+  database: db/production.sqlite3
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  pool: 5
+  timeout: 5000
