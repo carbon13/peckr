@@ -9,8 +9,8 @@ class Xchange < ActiveRecord::Base
   scope :joined_previous, -> { joins{ current_previous.xchange.inner }.select{['xchanges.*', 'xchanges.rate - xchanges_current_previous.rate']} }
   scope :pair_in, ->(pair_ids){ where{ pair_id << pair_ids} }
 
-  def self.current(pair_id)
-    Xchange.where{ pair_id == pair_id }.ordered_desc.first
+  def self.current(target_pair_id)
+    Xchange.where{ pair_id == target_pair_id }.ordered_desc.first
   end
   
   def previous(self_pair_id = self.pair_id, self_date = self.date, self_time = self.time, self_created_at = self.created_at)
