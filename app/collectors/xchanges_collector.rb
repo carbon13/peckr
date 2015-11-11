@@ -32,7 +32,7 @@ class XchangesCollector < YQLCollector
     end
   end
 
-  def self.recalculate_change
+  def recalculate_change
     pair_ids = Xchange.uniq.pluck(:pair_id)
     pairs_with_xchanges = Pair.pair_id_in(pair_ids).with_xchanges
     pairs_with_xchanges.each do |pair|
