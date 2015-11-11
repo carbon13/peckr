@@ -3,15 +3,15 @@ require "#{$APP_ROOT_PATH}/app/collectors/yql_collector.rb"
 
 class TweetsCollector < YQLCollector
   def initialize
-    twitter_api_config = YAML.load_file("#{$APP_ROOT_PATH}config/twitter_api.yml")
+    twitter_api_config = YAML.load(ERB.new(File.read("#{$APP_ROOT_PATH}/config/twitter_api.yml")).result)
     TweetStream.configure do |config|
-      config.consumer_key       = ENV['TW_CONSUMER_KEY']
-      config.consumer_secret    = ENV['TW_CONSUMER_SECRET']
-      config.oauth_token        = ENV['TW_ACCESS_TOKEN']
-      config.oauth_token_secret = ENV['TW_ACCESS_TOKEN_SECRET']
+      config.consumer_key       = twitter_api_config[$ENV]['consumer_key']
+      config.consumer_secret    = twitter_api_config[$ENV]['consumer_secret']
+      config.oauth_token        = twitter_api_config[$ENV]['access_token']
+      config.oauth_token_secret = twitter_api_config[$ENV]['access_token_secret']
       config.auth_method        = :oauth
     end
-    @file = File.open("#{$APP_ROOT_PATH}db/tweet_stream_#{Date.today.strftime('%Y%m%d%H%M%S')}.tsv", 'a')
+    @file = File.open("#{$APP_ROOT_PATH}db/tweet_stream_#{Time.now.strftime('%Y%m%d%H%M%S')}.tsv", 'a')
   end
 
   def sample_tweets

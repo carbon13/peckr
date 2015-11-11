@@ -7,9 +7,9 @@ require 'open-uri'
 require 'bundler'
 Bundler.require
 
-$ENV             = ENV['ENV'] || 'development'
-$APP_ROOT_PATH ||= File.expand_path('../../../', __FILE__)
-$DB_CONFIG     ||= YAML.load_file("#{$APP_ROOT_PATH}/config/database.yml")
+$ENV = ENV['ENV'] || 'development'
+$APP_ROOT_PATH = File.expand_path('../../../', __FILE__)
+$DB_CONFIG = YAML.load(ERB.new(File.read("#{$APP_ROOT_PATH}/config/database.yml")).result)
 
 Dir["#{$APP_ROOT_PATH}/app/models/*.rb"].each do |file|
   require file
