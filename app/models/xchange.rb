@@ -13,7 +13,7 @@ class Xchange < ActiveRecord::Base
     Xchange.where{ pair_id == target_pair_id }.ordered_desc.first
   end
   
-  def previous(self_pair_id = self.pair_id, self_date = self.date, self_time = self.time, self_created_at = self.created_at)
+  def previous(self_pair_id = self.pair_id, self_date = self.date, self_time = self.time, self_created_at = Time.now)
     Xchange.where{ pair_id == self_pair_id }.where{ (date < self_date) | ((date == self_date) & (time <= self_time) & (created_at < self_created_at)) }.ordered_desc.first
   end
 
