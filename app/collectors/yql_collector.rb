@@ -13,7 +13,7 @@ class YQLCollector
     @where_clause = where_clause
   end
 
-  def where_in(column_name, values, records_per_request = 200)
+  def where_in(column_name, values, records_per_request=200)
     @json_results_array = []
     column_name = (column_name.is_a? String) ? column_name : column_name.to_s
     values.each_slice(records_per_request).to_a.each do |sliced_values|
