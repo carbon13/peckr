@@ -15,6 +15,7 @@ class RssFeedsCollector
   end
 
   def store(results)
+    return if results.nil?
     results.each do |rss_source_link, result|
       result.xpath('//channel').each do |node|
         rss_source = RssSource.find_by(link: rss_source_link)
@@ -42,7 +43,7 @@ class RssFeedsCollector
   def query_bodies
     parsed_results = {}
     target_rss_feeds = RssFeed.has_no_body
-    exit unless target_rss_feeds.exists?
+    return unless target_rss_feeds.exists?
     target_rss_feeds.each do |target_rss_feed|
       parsed_body = Nokogiri::HTML.parse(open(target_rss_feed.link, redirect: true))
       parsed_results.store(target_rss_feed.id, parsed_body)
@@ -51,6 +52,7 @@ class RssFeedsCollector
   end
 
   def store_bodies(results)
+    return if results.nil?
     results.each do |rss_feed_id, result|
       trimed_body = result.xpath('//body').inner_text.gsub(/^[\s　]+|[\s　]+$/, "").gsub(/(\r\n|\r|\n)/, ' ')
       rss_feed = RssBody.new(rss_feed_id: rss_feed_id, body: trimed_body)
