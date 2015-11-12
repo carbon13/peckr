@@ -11,7 +11,7 @@ class TweetsCollector < YQLCollector
       config.oauth_token_secret = twitter_api_config[$ENV]['access_token_secret']
       config.auth_method        = :oauth
     end
-    @file = File.open("#{$APP_ROOT_PATH}db/tweet_stream_#{Time.now.strftime('%Y%m%d%H%M%S')}.tsv", 'a')
+    @file = File.open("#{$APP_ROOT_PATH}/db/tweet_stream_#{Time.now.strftime('%Y%m%d%H%M%S')}.tsv", 'a')
   end
 
   def sample_tweets
