@@ -19,16 +19,31 @@ Dir["#{$APP_ROOT_PATH}/app/collectors/*.rb"].each do |file|
   require file
 end
 
+ActiveRecord::Base.establish_connection($DB_CONFIG[$ENV])
+ActiveRecord::Base.logger = Logger.new("#{$APP_ROOT_PATH}/log/database_#{$ENV}.log")
+ActiveRecord::Base.default_timezone = :utc
+Time.zone_default = Time.find_zone! 'UTC'
+
 class Peckr
-  ActiveRecord::Base.establish_connection($DB_CONFIG[$ENV])
-  ActiveRecord::Base.logger = Logger.new("#{$APP_ROOT_PATH}/log/database_#{$ENV}.log")
-  ActiveRecord::Base.default_timezone = :utc
-  Time.zone_default = Time.find_zone! 'UTC'
+  include Clockwork
 
   def perform
-    XchangesCollector.new.query_and_store
-    QuotesCollector.new.query_and_store
-    RssFeedsCollector.new.query_and_store
+    every(10.seconds, 'xchanges_and_quotes_collection', thread: true) do
+      XchangesCollector.new.query_and_store
+      QuotesCollector.new.query_and_store
+    end
+
+    every(10.minutes, 'rss_feeds_collection', thread: true) do
+      RSSFeedsCollector.new.query_and_store
+    end
+
+    every(1.day, 'recalculation', at: '05:00', thread: true) do
+      XchangesCollector.new.recalculate_change
+    end
+
+    every(1.day, 'tweet_collection', at: '00:00', thread: true) do 
+      TweetsCollector.new.sample_tweets
+    end
   end
 end
 
