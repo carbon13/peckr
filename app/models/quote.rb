@@ -12,6 +12,6 @@ class Quote < ActiveRecord::Base
   end
 
   def registered?(self_ticker_symbol_id = self.ticker_symbol_id, self_last_trade_price_only = self.last_trade_price_only)
-    Quote.where{ ticker_symbol_id == self_ticker_symbol_id}.exists? ? Quote.where{ (ticker_symbol_id == self_ticker_symbol_id) & (last_trade_price_only == self_last_trade_price_only) & (created_at >= Date.today) & (created_at < Time.now + 5.minutes) }.exists? : false
+    Quote.where{ ticker_symbol_id == self_ticker_symbol_id }.exists? ? Quote.where{ (ticker_symbol_id == self_ticker_symbol_id) & (last_trade_price_only == self_last_trade_price_only) & (created_at >= Date.today) & (created_at < Time.now + 5.minutes) }.exists? : false
   end
 end
