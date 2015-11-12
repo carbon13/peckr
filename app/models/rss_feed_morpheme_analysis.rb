@@ -1,5 +1,4 @@
 # encoding: utf-8
-class RssFeedMorphemeAnalysis < ActiveRecord::Base
+class RSSFeedMorphemeAnalysis < ActiveRecord::Base
   belongs_to :rss_feed
-
 end

@@ -5,7 +5,7 @@ class Threshold < Floater
   default_scope -> { thresholds }
 
   def struck?(current_xchange)
-    !!((self.value < current_xchange.rate && self.value > (current_xchange.rate - current_xchange.change)) ||
-      (self.value > current_xchange.rate && self.value < (current_xchange.rate - current_xchange.change)))
+    !!((value < current_xchange.rate && value > current_xchange.previous_rate) ||
+       (value > current_xchange.rate && value < current_xchange.previous_rate))
   end
 end

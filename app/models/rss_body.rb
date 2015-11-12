@@ -1,4 +1,4 @@
 # encoding: utf-8
-class RssBody < ActiveRecord::Base
+class RSSBody < ActiveRecord::Base
   belongs_to :rss_feed
 end

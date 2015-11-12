@@ -17,7 +17,7 @@ class TweetsCollector < YQLCollector
   def sample_tweets
     TweetStream::Client.new.sample do |status|
       # HACK: To use map.
-      @file.puts "#{status.id}\t#{status.created_at}\t#{status.lang}\t#{status.user.id}\t#{status.user.screen_name}\t#{status.user.location}\t#{status.text.gsub(/(\n)/,' ')}"
+      @file.puts "#{status.id}\t#{status.created_at}\t#{status.lang}\t#{status.user.id}\t#{status.user.screen_name}\t#{status.user.location}\t#{status.text.gsub(/(\n)/, ' ')}"
     end
   end
 end
