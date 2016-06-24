@@ -1,0 +1,4 @@
+---
+BUNDLE_BUILD__RSRUBY: "-- --with-R-dir=/usr/lib/R --with-R-include=/usr/share/R/include"
+BUNDLE_PATH: vendor/bundle
+BUNDLE_DISABLE_SHARED_GEMS: true
