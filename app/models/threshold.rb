@@ -1,8 +1,10 @@
 # encoding: utf-8
-require "#{$APP_ROOT_PATH}/app/models/floater.rb"
 
 class Threshold < Floater
-  attr_accessor :current_xchange
+  default_scope -> { thresholds }
 
-  default_scope -> {thresholds}
+  def struck?(current_xchange)
+    !!((value < current_xchange.rate && value > current_xchange.previous_rate) ||
+       (value > current_xchange.rate && value < current_xchange.previous_rate))
+  end
 end

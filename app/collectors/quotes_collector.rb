@@ -1,55 +1,61 @@
 # encoding: utf-8
-require "#{$APP_ROOT_PATH}/app/collectors/yql_collector.rb"
+require "#{$APP_ROOT_PATH}/app/collectors/yahoo_collector.rb"
 
-class QuotesCollector < YQLCollector
-  def initialize(table_name='yahoo.finance.quote')
+class QuotesCollector < YahooCollector
+  def initialize(table_name = 'yahoo.finance.quote')
     super(table_name)
   end
 
   def query_and_store
-    self.store(self.query)
+    store(query)
   end
 
   def query
-    selected_ticker_symbols = TickerSymbol.selected.pluck(:ticker_symbol_id)
-    self.where_in(:symbol, selected_ticker_symbols)
+    column_search           = 's' # symbol
+    ticker_symbols_selected = TickerSymbol.selected.pluck(:ticker_symbol_id)
+    column_select           = 'a2c1ghjkj1l1mnsvx'
+    where_in(column_search, ticker_symbols_selected, column_select)
   end
 
   def store(results)
     ActiveRecord::Base.transaction do
       results.each do |result|
         current_quote = Quote.new
-        current_quote.average_daily_volume  = result['AverageDailyVolume']
-        current_quote.change                = result['Change']
-        current_quote.days_low              = result['DaysLow']
-        current_quote.days_high             = result['DaysHigh']
-        current_quote.year_low              = result['YearLow']
-        current_quote.year_high             = result['YearHigh']
-        current_quote.market_capitalization = result['MarketCapitalization']
-        current_quote.last_trade_price_only = result['LastTradePriceOnly']
-        current_quote.days_range            = result['DaysRange']
-        current_quote.name                  = result['Name']
-        current_quote.ticker_symbol_id      = result['Symbol'] # NOTE: Change column name according to ActiveRecord foreginkey naming rule.
-        current_quote.volume                = result['Volume']
-        current_quote.stock_exchange        = result['StockExchange']      
+        current_quote.average_daily_volume  = convert_nil(result[0])
+        current_quote.change                = convert_nil(result[1])
+        current_quote.days_low              = convert_nil(result[2])
+        current_quote.days_high             = convert_nil(result[3])
+        current_quote.year_low              = convert_nil(result[4])
+        current_quote.year_high             = convert_nil(result[5])
+        current_quote.market_capitalization = convert_nil(result[6])
+        current_quote.last_trade_price_only = convert_nil(result[7])
+        current_quote.days_range            = convert_nil(result[8])
+        current_quote.name                  = convert_nil(result[9])
+        # NOTE: Change column name according to ActiveRecord foreginkey naming rule.
+        current_quote.ticker_symbol_id      = convert_nil(result[10])
+        current_quote.volume                = convert_nil(result[11])
+        current_quote.stock_exchange        = convert_nil(result[12])
+
         current_quote.save unless current_quote.registered?
       end
     end
   end
 
   def update_master
+    column_search           =  's' # symbol
+    ticker_symbols_stored = TickerSymbol.all.pluck(:ticker_symbol_id)
+    column_select           = 'sn'
+    results = where_in(column_search, ticker_symbols_stored, column_select)
     ActiveRecord::Base.transaction do
-      ticker_symbol_ids = TickerSymbol.all.pluck(:ticker_symbol_id)
-      results = self.where_in(:symbol, ticker_symbol_ids)
       results.each do |result|
-        if ticker_symbol = TickerSymbol.find_by(ticker_symbol_id: result['Symbol'])
-          ticker_symbol.name = result['Name'] || 'Unknown'
-          # ticker_symbol.disabled = false
-          ticker_symbol.save
-        end
+        ticker_symbol = TickerSymbol.find_by(ticker_symbol_id: result[0])
+        next unless ticker_symbol
+        ticker_symbol.name = convert_nil(result[1]) || 'Unknown'
+        ticker_symbol.disabled = 0
+        ticker_symbol.save
       end
       not_updated_ticker_symbols = TickerSymbol.not_updated
-      # not_updated_ticker_symbols.update_all(disabled: true)
+      not_updated_ticker_symbols.update_all(disabled: 1)
     end
   end
 end

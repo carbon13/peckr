@@ -1,26 +1,62 @@
+#
+# SQLite config
+#
+# development:
+#   adapter: sqlite3
+#   host: localhost
+#   database: db/development.sqlite3
+#   username: <%= ENV['PECKR_USERNAME'] %>
+#   password: <%= ENV['PECKR_PASSWORD'] %>
+#   pool: 5
+#   timeout: 1200000
+
+# test:
+#   adapter: sqlite3
+#   host: localhost
+#   database: db/test.sqlite3
+#   username: <%= ENV['PECKR_USERNAME'] %>
+#   password: <%= ENV['PECKR_PASSWORD'] %>
+#   pool: 5
+#   timeout: 5000
+
+# production:
+#   adapter: sqlite3
+#   host: localhost
+#   database: db/production.sqlite3
+#   username: <%= ENV['PECKR_USERNAME'] %>
+#   password: <%= ENV['PECKR_PASSWORD'] %>
+#   pool: 5
+#   timeout: 5000
+
+#
+# MySQL config
+#
 development:
-  adapter: sqlite3
-  host: localhost
-  database: db/development.sqlite3
-  username: <%= ENV['DB_USERNAME'] %>
-  password: <%= ENV['DB_PASSWORD'] %>
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: peckr_development
   pool: 5
-  timeout: 30000
+  username: <%= ENV['PECKR_USERNAME'] %> 
+  password: <%= ENV['PECKR_PASSWORD'] %>
+  host: localhost
 
 test:
-  adapter: sqlite3
-  host: localhost
-  database: db/test.sqlite3
-  username: <%= ENV['DB_USERNAME'] %>
-  password: <%= ENV['DB_PASSWORD'] %>
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: peckr_test
   pool: 5
-  timeout: 5000
+  username: <%= ENV['PECKR_USERNAME'] %>
+  password: <%= ENV['PECKR_PASSWORD'] %>
+  host: localhost
 
 production:
-  adapter: sqlite3
-  host: localhost
-  database: db/production.sqlite3
-  username: <%= ENV['DB_USERNAME'] %>
-  password: <%= ENV['DB_PASSWORD'] %>
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: peckr_production
   pool: 5
-  timeout: 5000
+  username: <%= ENV['PECKR_USERNAME'] %>
+  password: <%= ENV['PECKR_PASSWORD'] %>
+  host: localhost
