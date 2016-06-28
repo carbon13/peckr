@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "#{$APP_ROOT_PATH}/app/models/floater.rb"
 
 class Threshold < Floater
   default_scope -> { thresholds }
