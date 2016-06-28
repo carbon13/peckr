@@ -9,3 +9,4 @@ db/
 tmp
 log/*
 vendor/bundle
+.ruby-version_*
