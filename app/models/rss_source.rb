@@ -1,7 +1,8 @@
 # encoding: utf-8
-class RSSSource < ActiveRecord::Base
+class RssSource < ActiveRecord::Base
   has_many :rss_feeds
-  has_many :rss_bodies, through: :rss_feeds
+  has_many :rss_details, through: :rss_feeds
+  has_many :rss_morphemes, through: :rss_details
   
   scope :no_details, -> { where{ (title == nil) | (description == nil) } }
 
@@ -14,6 +15,6 @@ class RSSSource < ActiveRecord::Base
   end
 
   def registered?
-    !!RSSSource.find_by(link: link).exists?
+    !!RssSource.find_by(link: link).exists?
   end
 end
