@@ -6,6 +6,6 @@ db/*.tsv
 db/*.sqlite3
 db/
 !db/mst*.sqlite3
-temp
+tmp
 log/*
 vendor/bundle
