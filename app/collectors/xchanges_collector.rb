@@ -1,7 +1,7 @@
 # encoding: utf-8
-require "#{$APP_ROOT_PATH}/app/collectors/yql_collector.rb"
+require "#{$APP_ROOT_PATH}/app/collectors/yahoo_collector.rb"
 
-class XchangesCollector < YQLCollector
+class XchangesCollector < YahooCollector
   def initialize(table_name = 'yahoo.finance.xchange')
     super(table_name)
   end
@@ -11,8 +11,10 @@ class XchangesCollector < YQLCollector
   end
 
   def query
+    column_search  = 's' # symbol
     selected_pairs = Pair.selected.pluck(:pair_id)
-    where_in(:pair, selected_pairs)
+    column_select  = 'snl1d1t1ab'
+    where_in(column_search, selected_pairs, column_select)
   end
 
   def store(results)
@@ -20,18 +22,29 @@ class XchangesCollector < YQLCollector
       results.each do |result|
         current_xchange = Xchange.new
         # NOTE: Change column name because 'id' is reserved by ActiveRecord.
-        current_xchange.pair_id = result['id']
-        current_xchange.name    = result['Name']
-        current_xchange.rate    = result['Rate']
-        current_xchange.date    = Date.strptime(result['Date'], '%m/%d/%Y')
-        # HACK: To convert UTC time smartly.
-        current_xchange.time    = Time.strptime(result['Time'], '%H:%M%p').strftime('%H:%M')
-        current_xchange.ask     = result['Ask']
-        current_xchange.bid     = result['Bid']
-        current_xchange.change  = current_xchange.rate - current_xchange.previous.rate unless current_xchange.previous.nil?
+        current_xchange.pair_id  = convert_nil(result[0])
+        current_xchange.name     = convert_nil(result[1])
+        current_xchange.rate     = convert_nil(result[2])
+        current_xchange.datetime = datetime(result)
+        current_xchange.ask      = convert_nil(result[5])
+        current_xchange.bid      = convert_nil(result[6])
+        current_xchange.change   = change(current_xchange)
+        
         current_xchange.save unless current_xchange.registered?
       end
     end
+  end
+
+  def datetime(result)
+    begin
+      Time.strptime("#{result[3]} #{result[4]} +0000", '%m/%d/%Y %H:%M%p %z').utc
+    rescue
+      nil
+    end
+  end
+
+  def change(xchange)
+    xchange.previous.nil? ? 0.0 : xchange.rate - xchange.previous.rate
   end
 
   def recalculate_change
@@ -49,23 +62,23 @@ class XchangesCollector < YQLCollector
       OrderedKey.delete_all
       xchange_ids_ordered = pair.xchanges.ordered_desc.pluck(:id)
       xchange_ids_ordered.each { |xchange_id| xchange_orderedkeys << OrderedKey.new(outer_id: xchange_id) }
-      OrderedKey.import [:outer_id], xchange_orderedkeys, validate: false
+      OrderedKey.import([:outer_id], xchange_orderedkeys, validate: false)
     end
   end
 
   def update_change
+    updated_xchanges = []
+    xchanges_joined_previous = Xchange.joined_previous.all
     ActiveRecord::Base.transaction do
-      xchanges_updated = []
-      xchanges_joined_previous = Xchange.joined_previous.all
       xchanges_joined_previous.find_each do |xchange|
         xchange.change = xchange.attributes['xchanges.rate - xchanges_current_previous.rate'] || 0.0
         # OPTIMIZE: "on_duplicate_key_update" option for bulk update is only available on mysql.
         #   Use ActiveRecord "save" method instead.
-        ['mysql'].include?($DB_CONFIG[$ENV]['adapter']) ? xchanges_updated << xchange : xchange.save
+        ['mysql'].include?($DB_CONFIG[$ENV]['adapter']) ? updated_xchanges << xchange : xchange.save
       end
       if ['mysql'].include?($DB_CONFIG[$ENV]['adapter'])
-        updated_xchanges_maped  = xchanges_updated.map { |xchange| [xchange.id, xchange.change] }
-        Xchange.import [:id, :change], updated_xchanges_maped, on_duplicate_key_update: [:id]
+        maped_updated_xchanges = updated_xchanges.map { |xchange| [xchange.id, xchange.change] }
+        Xchange.import([:id, :change], maped_updated_xchanges, on_duplicate_key_update: [:id])
       end
       OrderedKey.delete_all
     end

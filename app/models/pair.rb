@@ -1,6 +1,7 @@
 # encoding: utf-8
 class Pair < ActiveRecord::Base
   has_many :xchanges, primary_key: :pair_id, foreign_key: :pair_id
+  has_many :xchange_stastics, primary_key: :pair_id, foreign_key: :pair_id
   has_many :floaters, primary_key: :pair_id, foreign_key: :pair_id
   
   scope :selected, -> { where{ selected == 1 } }

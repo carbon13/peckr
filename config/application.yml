@@ -1,0 +1,11 @@
+default: &default
+  calendar_uri: http://fx.minkabu.jp/indicators/calendar
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

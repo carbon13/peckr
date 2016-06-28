@@ -5,8 +5,7 @@ class CreatePeckrModels < ActiveRecord::Migration
       t.string :pair_id
       t.string :name
       t.float :rate
-      t.date :date
-      t.time :time
+      t.datetime :datetime
       t.float :ask
       t.float :bid
       t.float :change
@@ -51,7 +50,7 @@ class CreatePeckrModels < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :rss_bodies do |t|
+    create_table :rss_details do |t|
       t.references :rss_feed
       t.text :body
 
@@ -79,7 +78,7 @@ class CreatePeckrModels < ActiveRecord::Migration
       t.float :last_trade_price_only
       t.string :days_range
       t.string :name
-      t.references :ticker_symbol, null: :false
+      t.string :ticker_symbol_id, null: :false
       t.integer :volume
       t.string :stock_exchange
 
@@ -90,6 +89,19 @@ class CreatePeckrModels < ActiveRecord::Migration
       t.integer :outer_id, null: false
     end
 
+    create_table :events do |t|
+      t.datetime :datetime
+      t.string :country_id
+      t.text :indicator
+      t.integer :impact_factor
+      t.string :previous_value
+      t.string :estimated_value
+      t.string :previous_impact_usdjpy
+      t.boolean :selected, default: false, null: false
+
+      t.timestamps null: false
+    end
+
     execute <<-SQL
       CREATE VIEW current_previous AS 
         SELECT outer_table.outer_id, inner_table.outer_id AS inner_id 
@@ -97,17 +109,38 @@ class CreatePeckrModels < ActiveRecord::Migration
             ON outer_table.id + 1 = inner_table.id
     SQL
 
+    unless ActiveRecord::Base.connection.table_exists? :tweets
+      create_table :tweets do |t|
+        t.string :status_id
+        t.string :user_id
+        t.datetime :tweeted_at
+
+        t.timestamps null: false
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? :tweet_morphemes
+      create_table :tweet_morphemes do |t|
+        t.string :surface
+        t.string :count
+        t.references :tweet
+
+        t.timestamps null: false
+      end
+    end
   end
 
   def self.change
-    add_index :xchanges, [:created_at, :time, :date]
-    add_index :floater_types, [:sort_id]
+    add_index :xchanges, [:created_at, :datetime]
     add_index :pairs, [:pair_id], unique: :true
     add_index :pairs, [:sort_id]
     add_index :rss_sources, [:link]
     add_index :ticker_symbols, [:ticker_symbol_id]
     add_index :ticker_symbols, [:sort_id]
     add_index :quotes, [:ticker_symbol]
+    add_index :events, [:datetime]
+    add_index :tweeets, [:status_id]
+    add_index :tweeet_tweet_morphemes, [:status_id]
   end
 
   def self.down
@@ -120,6 +153,11 @@ class CreatePeckrModels < ActiveRecord::Migration
     drop_table :quotes
     drop_table :rss_sources
     drop_table :rss_feeds
-    drop_table :rss_bodies
+    drop_table :rss_details
+    drop_table :events
+    drop_table :tweets
+   tweeetstablstatus_ids
+   tweeettablstatus_ids
+    drop_table :tweet_morphemes
   end
 end

@@ -20,7 +20,7 @@ Time.zone_default = Time.find_zone! 'UTC'
 
 class Anglr
   include Clockwork
-  
+
   floator_type_names = %w(threshold velocity)
   floator_type_names.each do |name|
     define_method "check_#{name}" do

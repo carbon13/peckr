@@ -1,5 +1,4 @@
 # encoding: utf-8
-require 'pry'
 require 'yaml'
 require 'net/http'
 require 'uri'
@@ -28,21 +27,19 @@ class Peckr
   include Clockwork
 
   def perform
-    every(10.seconds, 'xchanges_and_quotes_collection', thread: true) do
+    Thread.new do 
+      TweetsCollector.new.sample_tweets
+    end
+    every(30.seconds, 'xchanges_and_quotes_collection', thread: true) do
       XchangesCollector.new.query_and_store
       QuotesCollector.new.query_and_store
     end
-
-    every(10.minutes, 'rss_feeds_collection', thread: true) do
-      RSSFeedsCollector.new.query_and_store
+    every(10.minutes, 'rss_collection', thread: true) do
+      RssCollector.new.query_and_store
     end
-
-    every(1.day, 'recalculation', at: '05:00', thread: true) do
+    every(1.day, 'recalculation_and_events_collection', at: '05:00', thread: true) do
       XchangesCollector.new.recalculate_change
-    end
-
-    every(1.day, 'tweet_collection', at: '00:00', thread: true) do 
-      TweetsCollector.new.sample_tweets
+      # EventsCollector.new.query_and_store
     end
   end
 end
