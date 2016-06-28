@@ -11,7 +11,7 @@ class TweetsCollector
       config.oauth_token_secret = twitter_api_config[$ENV]['access_token_secret']
       config.auth_method        = :oauth
     end
-    @file = File.open("#{$APP_ROOT_PATH}/db/tweet_stream_#{Time.now.strftime('%Y%m%d%H%M%S')}.tsv", 'a')
+    # @file = File.open("#{$APP_ROOT_PATH}/db/tweet_stream_#{Time.now.strftime('%Y%m%d%H%M%S')}.tsv", 'a')
   end
 
   def sample_tweets
@@ -19,7 +19,7 @@ class TweetsCollector
     tweet_morphemes = []
     batch_size      = 100
     header = %w{status_id user_id tweeted_at text}
-    @file.puts header.join("\t")
+    # @file.puts header.join("\t")
     TweetStream::Client.new.sample do |status|
       # HACK: To use map.
       # extended sample
