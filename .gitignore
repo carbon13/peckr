@@ -4,8 +4,8 @@
 db/migrate/processed
 db/*.tsv
 db/*.sqlite3
-db/
 !db/mst*.sqlite3
+!db/utils*
 tmp
 log/*
 vendor/bundle
