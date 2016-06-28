@@ -33,8 +33,7 @@ class TweetsCollector
       if tweets.length >= batch_size
         Tweet.import tweets
         tweets = []
-        binding.pry
-        TweetMorpheme.import tweet_morphemes
+        TweetMorpheme.import tweet_morphemes.flatten
         tweet_morphemes = []
       end
     end
