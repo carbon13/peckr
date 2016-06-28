@@ -6,7 +6,9 @@ db/*.tsv
 db/*.sqlite3
 !db/mst*.sqlite3
 !db/utils*
-tmp
+tmp/*
 log/*
+test/*
+!.gitkeep
 vendor/bundle
 .ruby-version_*
