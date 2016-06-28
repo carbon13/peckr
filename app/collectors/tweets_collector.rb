@@ -18,7 +18,7 @@ class TweetsCollector
     tweets          = []
     tweet_morphemes = []
     batch_size      = 100
-    header = %w{status_id user_id tweeted_at text}
+    # header = %w{status_id user_id tweeted_at text}
     # @file.puts header.join("\t")
     TweetStream::Client.new.sample do |status|
       # HACK: To use map.
@@ -33,6 +33,7 @@ class TweetsCollector
       if tweets.length >= batch_size
         Tweet.import tweets
         tweets = []
+        binding.pry
         TweetMorpheme.import tweet_morphemes
         tweet_morphemes = []
       end
