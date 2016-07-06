@@ -4,6 +4,7 @@ require 'net/http'
 require 'uri'
 require 'open-uri'
 require 'bundler'
+require 'logger'
 Bundler.require
 
 $ENV = ENV['ENV'] || 'development'
@@ -26,6 +27,8 @@ Time.zone_default = Time.find_zone! 'UTC'
 class Peckr
   include Clockwork
 
+  @@log = Logger.new('log/error.log')
+  @@log.level=Logger::ERROR
   def perform
     Thread.new do 
       TweetsCollector.new.sample_tweets
